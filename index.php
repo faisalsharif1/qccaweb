@@ -13,6 +13,7 @@ if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
 require_once "config.php";
 
 // Define variables and initialize with empty values
+//another coment just to check github
 $username = $password = "";
 $username_err = $password_err = "";
 
