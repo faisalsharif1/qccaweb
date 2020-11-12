@@ -67,7 +67,10 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                             <div class="card card-custom bg-gray-100 card-stretch gutter-b">
                                                 <!--begin::Header-->
                                                 <div class="card-header border-0 bg-danger py-5">
-                                                    <h3 class="card-title font-weight-bolder text-white dashboard-title"> قومی کول کمیٹی آخوروال درہ آدم خیل
+                                                    <h3
+                                                        class="card-title font-weight-bolder text-white dashboard-title marquee">
+                                                        قومی کول کمیٹی آخوروال درہ آدم
+                                                        خیل
                                                     </h3>
                                                 </div>
                                                 <!--end::Header-->
@@ -76,9 +79,9 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                     <!--begin::Stats-->
                                                     <div class="card-spacer mt-n25">
                                                         <!--begin::Row-->
-                                                        <div class="row mt-25">
+                                                        <div class="row mt-25 animate__animated animate__fadeInLeft">
                                                             <div
-                                                                class="col bg-light-warning px-6 py-8 rounded-xl mr-7 mb-7">
+                                                                class="col bg-light-warning px-6 py-8 rounded-xl mr-7 mb-7 ">
                                                                 <span
                                                                     class="svg-icon svg-icon-3x svg-icon-warning d-block my-2">
                                                                     <!--begin::Svg Icon | path:assets/media/svg/icons/Media/Equalizer.svg-->
@@ -139,7 +142,7 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                         <!--end::Row-->
                                                         <!--begin::Row-->
                                                         <!--begin::Row-->
-                                                        <div class="row mt-0">
+                                                        <div class="row mt-0 animate__animated animate__fadeInRight">
                                                             <div
                                                                 class="col bg-light-danger px-6 py-8 rounded-xl mr-7 mb-7">
                                                                 <span
@@ -167,7 +170,7 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                                     <!--end::Svg Icon-->
                                                                 </span>
                                                                 <a href="customers.php"
-                                                                    class="text-warning font-weight-bold font-size-h6 dashboard-button-title" >
+                                                                    class="text-warning font-weight-bold font-size-h6 dashboard-button-title">
                                                                     کسٹمرز </a>
                                                             </div>
                                                             <div class="col bg-light-primary px-6 py-8 rounded-xl mb-7">
@@ -202,7 +205,7 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                         </div>
                                                         <!--end::Row-->
                                                         <!--begin::Row-->
-                                                        <div class="row mt-0">
+                                                        <div class="row mt-0 animate__animated animate__fadeInUp">
                                                             <div
                                                                 class="col bg-light-danger px-6 py-8 rounded-xl mr-7 mb-7">
                                                                 <span

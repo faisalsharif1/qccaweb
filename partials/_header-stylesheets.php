@@ -16,11 +16,35 @@
  <link href="assets/css/themes/layout/aside/light.css" rel="stylesheet" type="text/css" />
  <link href="assets/css/themes/layout/aside/light.css" rel="stylesheet" type="text/css" />
 
-
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
  <style>
 .hidden {
     display: none;
+}
+
+.marquee {
+    margin: 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    position: absolute;
+}
+
+.marquee {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 5s linear infinite;
+}
+
+
+@keyframes marquee {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(-100%, 0);
+    }
 }
  </style>
 
