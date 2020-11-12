@@ -23,33 +23,38 @@
     display: none;
 }
  </style>
- 
+
  <style>
-        @font-face {
-        font-family: noori;
-        src: url(assets/noori.ttf);
-        font-weight: normal;
-        }
-        .dashboard-title {
-            font-family: noori !important;
-            font-size: 40px !important;
-        }
-        .dashboard-button-title {
-            font-family: noori !important;
-            font-size: 40px !important;
-        }
-        .menu-title {
-            font-family: noori !important;
-            font-size: 25px !important;
-        }
-        .noori-normal {
-            font-family: noori !important;
-        }
-        .noori-normal-12 {
-            font-family: noori !important;
-            font-size:18px !important;
-        }
-    </style>
+@font-face {
+    font-family: noori;
+    src: url(assets/noori.ttf);
+    font-weight: normal;
+}
+
+.dashboard-title {
+    font-family: noori !important;
+    font-size: 25px !important;
+}
+
+.dashboard-button-title {
+    font-family: noori !important;
+    font-size: 25px !important;
+}
+
+.menu-title {
+    font-family: noori !important;
+    font-size: 20px !important;
+}
+
+.noori-normal {
+    font-family: noori !important;
+}
+
+.noori-normal-12 {
+    font-family: noori !important;
+    font-size: 18px !important;
+}
+ </style>
 
  <!--end::Layout Themes-->
  <link rel="shortcut icon" href="assets/media/logos/favicon.png" />

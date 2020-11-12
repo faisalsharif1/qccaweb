@@ -141,8 +141,10 @@ function DisplayInvoiceDetails($link, $fnInvNumber)
 
 
     // Prepare a select statement
-    $sql = "SELECT a.AccountTitle , t.Particulars , t.Amount FROM accounts a JOIN transactions t ON a.AccountId =
-t.AccountId
+    $sql = "SELECT a.AccountTitle , t.Particulars , t.Amount , m.minedescription , 
+    CASE WHEN t.incexptag = 0 then '' when t.incexptag = 1 then 'income' else 'expense' end 'entrytype'
+ FROM accounts a JOIN transactions t ON a.AccountId =
+t.AccountId left join mine m on m.id = t.mineid
 WHERE t.InvoiceNumber = $fnInvNumber";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
@@ -157,7 +159,7 @@ WHERE t.InvoiceNumber = $fnInvNumber";
             // Store result
             $bindresult = mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result($stmt, $AccountTitle, $Particulars, $Amount);
+            mysqli_stmt_bind_result($stmt, $AccountTitle, $Particulars, $Amount, $MineDescription, $EntryType);
 
 
 
@@ -194,6 +196,25 @@ WHERE t.InvoiceNumber = $fnInvNumber";
             <?php echo $AccountTitle; ?></a>
         <span class=" font-weight-bold menu-title"><?php echo $Particulars; ?></span>
     </div>
+
+    <?php if ($Amount > 0 && strlen($MineDescription) > 0) { ?>
+    <div class="d-flex flex-column flex-grow-1 mr-2">
+
+        <a href="#" class="font-weight-bold text-dark-75 text-hover-primary font-size-lg mb-1">
+            <?php echo "Mine Selected"; ?></a>
+        <span class=" font-weight-bold menu-title"><?php echo $MineDescription; ?></span>
+    </div>
+    <?php } ?>
+
+    <?php if ($Amount > 0 && strlen($EntryType) > 0) { ?>
+    <div class="d-flex flex-column flex-grow-1 mr-2">
+
+        <a href="#" class="font-weight-bold text-dark-75 text-hover-primary font-size-lg mb-1">
+            <?php echo "Entry Type"; ?></a>
+        <span class=" font-weight-bold menu-title"><?php echo $EntryType; ?></span>
+    </div>
+    <?php } ?>
+
     <!--end::Title-->
     <!--begin::Lable-->
     <span class="font-weight-bolder text-warning py-1 font-size-lg"> <?php echo number_format($Amount); ?></a> </span>

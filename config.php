@@ -7,7 +7,7 @@ define('DB_PASSWORD', 'Gladiater1');
 define('DB_NAME', 'MushtarikaAkhurwalCoalV5');
 
 /* Attempt to connect to MySQL database */
-$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME, 3306);
 
 // Check connection
 if ($link === false) {
