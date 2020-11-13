@@ -68,10 +68,11 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                 <!--begin::Header-->
                                                 <div class="card-header border-0 bg-danger py-5">
                                                     <h3
-                                                        class="card-title font-weight-bolder text-white dashboard-title marquee">
+                                                        class="card-title font-weight-bolder text-white dashboard-title">
                                                         قومی کول کمیٹی آخوروال درہ آدم
                                                         خیل
                                                     </h3>
+                                                    <h3> </h3>
                                                 </div>
                                                 <!--end::Header-->
                                                 <!--begin::Body-->
