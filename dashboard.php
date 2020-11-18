@@ -270,6 +270,40 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
                                                                 </a>
                                                             </div>
                                                         </div>
+                                                        <div class="row mt-0 animate__animated animate__fadeInUp">
+                                                            <div
+                                                                class="col bg-light-danger px-6 py-8 rounded-xl mr-7 mb-7">
+                                                                <span
+                                                                    class="svg-icon svg-icon-3x svg-icon-warning d-block my-2">
+                                                                    <!--begin::Svg Icon | path:assets/media/svg/icons/Media/Equalizer.svg-->
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                        width="24px" height="24px" viewBox="0 0 24 24"
+                                                                        version="1.1">
+                                                                        <g stroke="none" stroke-width="1" fill="none"
+                                                                            fill-rule="evenodd">
+                                                                            <rect x="0" y="0" width="24" height="24">
+                                                                            </rect>
+                                                                            <rect fill="#000000" opacity="0.3" x="13"
+                                                                                y="4" width="3" height="16" rx="1.5">
+                                                                            </rect>
+                                                                            <rect fill="#000000" x="8" y="9" width="3"
+                                                                                height="11" rx="1.5"></rect>
+                                                                            <rect fill="#000000" x="18" y="11" width="3"
+                                                                                height="9" rx="1.5"></rect>
+                                                                            <rect fill="#000000" x="3" y="13" width="3"
+                                                                                height="7" rx="1.5"></rect>
+                                                                        </g>
+                                                                    </svg>
+                                                                    <!--end::Svg Icon-->
+                                                                </span>
+                                                                <a href="vehiclesoutsummary.php"
+                                                                    class="text-warning font-weight-bold font-size-h6 dashboard-button-title">
+                                                                    گاڑیوں کی ترسیل </a>
+                                                            </div>
+
+
+                                                        </div>
                                                     </div>
                                                     <!--end::Stats-->
                                                     <div class="resize-triggers">

@@ -58,7 +58,7 @@ WHERE  cast(t.TransactionDate as date) >= ? AND cast(t.TransactionDate as date) 
     <div class="card card-custom card-stretch gutter-b">
         <!--begin::Header-->
 
-        <div class="card-header border-0">
+        <div class="card-header border-0 bg-light-primary">
             <h3 class="card-title font-weight-bolder text-dark"> Serial No
                 <?php echo $SerialNo ?> </h3>
 
@@ -84,9 +84,9 @@ WHERE  cast(t.TransactionDate as date) >= ? AND cast(t.TransactionDate as date) 
         </div>
         <!--end::Header-->
         <!--begin::Body-->
-        <div class="card-body pt-0">
+        <div class="card-body pt-0 bg-gradient-light">
             <!--begin::Item-->
-            <span class="label mb-4 label-lg label-light-primary label-inline font-weight-bold py-4">
+            <span class="label mb-4 label-lg label-light-primary label-inline font-weight-bold mt-5">
                 <?php echo $TransactionDate; ?>
             </span>
 

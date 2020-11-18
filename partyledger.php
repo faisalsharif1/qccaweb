@@ -102,7 +102,7 @@ function DisplayAccounts()
     mysqli_set_charset($link, "utf8");
     $sql = "";
 
-    $sql = "SELECT AccountId , AccountTitle FROM Accounts";
+    $sql = "SELECT accountid , accounttitle FROM accounts";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
 
@@ -225,7 +225,7 @@ function DisplayAccounts()
                                                             </div>
                                                             <div class="col-lg-5 mt-4">
                                                                 <label> Filter By </label>
-                                                                <select class="form-control select2" id="filterby"
+                                                                <select class="form-control" id="filterby"
                                                                     name="filterby">
                                                                     <?php DisplayAccounts() ?>
                                                                 </select>
@@ -310,10 +310,7 @@ function DisplayAccounts()
     <script type="text/javascript">
     $(document).ready(function() {
 
-        $('#filterby').select2({
-            placeholder: 'Select an option',
-            dir: "rtl"
-        });
+
 
         $('#tbl').DataTable({
 
