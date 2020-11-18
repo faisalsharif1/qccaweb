@@ -72,7 +72,7 @@ function DisplayLedger()
 
 
 <tr>
-    <td> <?php echo date_format(new DateTime($TransactionDate), 'd-m-Y'); ?> </td>
+    <td class="text-nowrap"> <?php echo date_format(new DateTime($TransactionDate), 'd-m-Y'); ?> </td>
     <td> <?php echo $SerialNo; ?> </td>
     <td style="text-align: right; direction: rtl;"> <?php echo $Particulars; ?> </td>
     <td> <?php echo number_format($Amount) ?> </td>
@@ -151,9 +151,9 @@ function DisplayAccounts()
     <meta name="description" content="Description here" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-    <?php include_once("partials/_header-stylesheets.php"); ?>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <?php include_once("partials/_header-stylesheets.php"); ?>
 
 </head>
 
@@ -200,6 +200,7 @@ function DisplayAccounts()
                                                 <div class="card-body">
                                                     <form method="post" action="partyledger.php">
                                                         <div class="form-group row">
+
                                                             <div class="col-lg-3 mt-4">
                                                                 <label> From Date :</label>
                                                                 <input type="text" class="form-control"
@@ -225,7 +226,7 @@ function DisplayAccounts()
                                                             </div>
                                                             <div class="col-lg-5 mt-4">
                                                                 <label> Filter By </label>
-                                                                <select class="form-control" id="filterby"
+                                                                <select class="form-control select2" id="filterby"
                                                                     name="filterby">
                                                                     <?php DisplayAccounts() ?>
                                                                 </select>
@@ -250,29 +251,31 @@ function DisplayAccounts()
                                         <div class="col-lg-12">
                                             <div class="card card-primary">
                                                 <div class="card-body">
+                                                    <div class="table-responsive">
+                                                        <table id="tbl" class="table table-striped">
+                                                            <thead>
+                                                                <tr>
 
-                                                    <table id="tbl" class="table">
-                                                        <thead>
-                                                            <tr>
-
-                                                                <th>تاریخ</th>
-                                                                <th> سیریل </th>
-                                                                <th> تفصیل</th>
-                                                                <th> رقم </th>
-                                                                <th> بیلنس </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <?php
-
-
-                                                            DisplayLedger();
+                                                                    <th style="width:80px;">تاریخ</th>
+                                                                    <th style="width:80px;"> سیریل </th>
+                                                                    <th style="width:100%" class="text-right"> تفصیل
+                                                                    </th>
+                                                                    <th style="width:140px;"> رقم </th>
+                                                                    <th style="width:141;"> بیلنس </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php
 
 
+                                                                DisplayLedger();
 
-                                                            ?>
-                                                        </tbody>
-                                                    </table>
+
+
+                                                                ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -311,6 +314,9 @@ function DisplayAccounts()
     $(document).ready(function() {
 
 
+        $('#filterby').select2({
+            width: "100%"
+        });
 
         $('#tbl').DataTable({
 

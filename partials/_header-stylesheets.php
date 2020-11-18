@@ -78,6 +78,11 @@
     font-family: noori !important;
     font-size: 18px !important;
 }
+
+select2-container .select2-selection--single {
+
+    height: 39px !important;
+}
  </style>
 
  <!--end::Layout Themes-->
