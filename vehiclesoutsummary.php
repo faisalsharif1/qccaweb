@@ -37,16 +37,16 @@ function DisplayAttendences()
 
     if (!isset($_POST["filterby"]) or $_POST["filterby"] == "0") {
         $sql = "select ct.customertype , c.partyName , count(kg.id) 'TotalVehiclesOut' , sum(ckl.WeightInTons - kg.WeightInTons) 'totaltons'
-	, sum(ckl.TotalPrice) 'totalprice'	from customertypes ct join companies c on ct.Id = c.customertypeid
+	, sum(ckl.TotalPrice) 'totalprice' , ckl.PricePerTon	from customertypes ct join companies c on ct.Id = c.customertypeid
 	join kanta_general kg on kg.CompanyId = c.id join company_kanta_log ckl on kg.id = ckl.Kanta_General_Id
 where kg.EntryDateTime >= ? and kg.entrydatetime < date_add(?,interval 1 day)
-group by ct.customertype , c.partyname order by ct.customertype;";
+group by ct.customertype , c.partyname , ckl.PricePerTon order by ct.customertype , partyname;";
     } else {
         $sql = "select ct.customertype , c.partyName , count(kg.id) 'TotalVehiclesOut' , sum(ckl.WeightInTons - kg.WeightInTons) 'totaltons'
-        , sum(ckl.TotalPrice) 'totalprice'	from customertypes ct join companies c on ct.Id = c.customertypeid
+        , sum(ckl.TotalPrice) 'totalprice' , ckl.PricePerTon	from customertypes ct join companies c on ct.Id = c.customertypeid
         join kanta_general kg on kg.CompanyId = c.id join company_kanta_log ckl on kg.id = ckl.Kanta_General_Id
     where kg.EntryDateTime >= ? and kg.entrydatetime < date_add(?,interval 1 day) and ct.id = ?
-    group by ct.customertype , c.partyname order by ct.customertype;";
+    group by ct.customertype , c.partyname , ckl.PricePerTon order by ct.customertype , partyname;";
     }
 
     if ($stmt = mysqli_prepare($link, $sql)) {
@@ -76,7 +76,7 @@ group by ct.customertype , c.partyname order by ct.customertype;";
             // Store result
             mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result($stmt,  $CustomerType, $PartyName, $TotalVehiclesOut, $TotalTons, $TotalAmount);
+            mysqli_stmt_bind_result($stmt,  $CustomerType, $PartyName, $TotalVehiclesOut, $TotalTons, $TotalAmount, $PricePerTon);
 
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
@@ -87,6 +87,7 @@ group by ct.customertype , c.partyname order by ct.customertype;";
 
 <tr>
     <td class="noori-normal-12"> <?php echo $PartyName; ?> </td>
+    <td><?php echo number_format($PricePerTon); ?></td>
     <td> <?php echo number_format($TotalVehiclesOut) ?> </td>
     <td> <?php echo number_format($TotalTons) ?> </td>
     <td> <?php echo number_format($TotalAmount) ?> </td>
@@ -236,6 +237,7 @@ group by ct.customertype , c.partyname order by ct.customertype;";
                                                             <tr>
 
                                                                 <th>نام</th>
+                                                                <th>فی ٹن ریٹ</th>
                                                                 <th>ٹوٹل گاڑیاں</th>
                                                                 <th>ٹوٹل ٹن</th>
                                                                 <th>ٹوٹل رقم</th>
@@ -253,6 +255,7 @@ group by ct.customertype , c.partyname order by ct.customertype;";
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
+                                                                <td></td>
                                                                 <td></td>
                                                                 <td><?php echo number_format($GLOBALS['_TotalVehicles']); ?>
                                                                 </td>
