@@ -4,7 +4,9 @@
 // Initialize the session
 session_start();
 
-
+$_TotalTons = 0;
+$_TotalValue = 0;
+$_TotalVehicles = 0;
 
 if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
     header("location: index.php");
@@ -72,7 +74,7 @@ function DisplayCompanyDetails()
     <td> <?php echo Number_Format($TotalAmount) ?> </td>
 </tr>
 
-<?php endwhile;
+<?php $GLOBALS['_TotalValue'] += $TotalAmount; $GLOBALS["_TotalTons"] += $TotalTons; $GLOBALS["_TotalVehicles"] += 1; endwhile;
             }
         } else {
             echo "Oops! Something went wrong. Please try again later.";
@@ -220,6 +222,15 @@ function DisplayCompanyDetails()
 
                                                             ?>
                                                         </tbody>
+                                                        <tfoot>
+                                                            <tr>
+<td></td>
+<td>ٹوٹل</td>
+<td><?php echo number_format($GLOBALS['_TotalVehicles']); ?></td>
+<td><?php echo number_format($GLOBALS['_TotalTons']); ?></td>
+<td><?php echo number_format($GLOBALS['_TotalValue']); ?></td>
+                                                            </tr>
+                                                        </tfoot>
                                                     </table>
                                                 </div>
                                             </div>
