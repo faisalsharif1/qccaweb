@@ -13,13 +13,7 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
 $FromDate;
 $ToDate;
 
-if (isset($_POST["kt_datepicker_1"])) {
-    $FromDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_1"]));
-}
 
-if (isset($_POST["kt_datepicker_2"])) {
-    $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
-}
 
 $querytext = "";
 
@@ -44,6 +38,8 @@ function DisplayLedger()
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt, "ssss", $FromDate, $AccountId, $FromDate, $ToDate);
 
+        if (!isset($_GET["fromdate"]))
+        {
         if (!isset($_POST["kt_datepicker_1"])) {
             $FromDate = Date('Y-m-d');
             $ToDate = Date('Y-m-d');
@@ -57,8 +53,13 @@ function DisplayLedger()
         } else {
             $AccountId = $_POST["filterby"];
         }
-
-        // Attempt to execute the prepared statement
+    }
+    else{
+        $FromDate = Date('Y-m-d',$_GET["fromdate"]);
+        $ToDate = Date('Y-m-d',$_GET["todate"]);
+        $AccountId = $_GET["accountid"];
+    }
+            // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
             // Store result
             mysqli_stmt_store_result($stmt);
@@ -119,7 +120,11 @@ function DisplayAccounts()
                     if (isset($_POST['filterby']) && $_POST['filterby'] == $AccountId) {
                         echo "<option value= " . $AccountId . " selected>" . $AccountTitle . "</option>";
                     } else {
-                        echo "<option value= " . $AccountId . ">" . $AccountTitle . "</option>";
+                        if (isset($_GET['accountid']) && $_GET['accountid'] == $AccountId) {
+                            echo "<option value= " . $AccountId . " selected>" . $AccountTitle . "</option>";
+                        }
+                        else{
+                        echo "<option value= " . $AccountId . ">" . $AccountTitle . "</option>";}
                     }
                 }
             } else {
@@ -207,7 +212,13 @@ function DisplayAccounts()
                                                                     id="kt_datepicker_1" name="kt_datepicker_1"
                                                                     readonly="readonly" placeholder="Select date"
                                                                     value="<?php if (!isset($_POST["kt_datepicker_1"])) {
+                                                                                                                                                                                                              if (isset($_GET["fromdate"]))
+                                                                                                                                                                                                              {
+                                                                                                                                                                                                                echo Date('m/d/Y', html_entity_decode($_GET["fromdate"]));                                                
+                                                                                                                                                                                                              }   
+                                                                                                                                                                                                              else{                       
                                                                                                                                                                                                                 echo date('m/d/Y');
+                                                                                                                                                                                                              }
                                                                                                                                                                                                             } else {
                                                                                                                                                                                                                 echo Date('m/d/Y', strtotime($_POST["kt_datepicker_1"]));
                                                                                                                                                                                                             } ?>">
@@ -218,7 +229,13 @@ function DisplayAccounts()
                                                                     id="kt_datepicker_2" , name="kt_datepicker_2"
                                                                     readonly="readonly" placeholder="Select date"
                                                                     value="<?php if (!isset($_POST["kt_datepicker_2"])) {
-                                                                                                                                                                                                                echo date('m/d/Y');
+                                                                                                                                                                                                                 if (isset($_GET["todate"]))
+                                                                                                                                                                                                                 {
+                                                                                                                                                                                                                   echo Date('m/d/Y', html_entity_decode($_GET["todate"]));                                                
+                                                                                                                                                                                                                 }   
+                                                                                                                                                                                                                 else{                       
+                                                                                                                                                                                                                   echo date('m/d/Y');
+                                                                                                                                                                                                                 }
                                                                                                                                                                                                             } else {
                                                                                                                                                                                                                 echo Date('m/d/Y', strtotime($_POST["kt_datepicker_2"]));
                                                                                                                                                                                                             } ?>">

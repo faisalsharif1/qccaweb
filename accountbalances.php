@@ -35,11 +35,11 @@ function DisplayLedger()
     $sql = "";
 
 
-    $sql = "select row_number() over (order by a.accounttitle) as abc , a.accounttitle , sum(tr.amount) 'balance'
+    $sql = "select row_number() over (order by a.accounttitle) as abc , a.accounttitle , sum(tr.amount) 'balance',a.accountid
     from heads h join categories c on h.id = c.headid join accounts a on c.categoryid = a.categoryid 
     join transactions tr on a.accountid = tr.accountid where cast(transactiondate as date) >= ? and cast(transactiondate as date) < date_add(?,interval 1 day)
     and h.id = case when ? = 0 then h.id else ? end and c.categoryid = case when ? = 0 then c.categoryid else ? end
-    group by a.accounttitle";
+    group by a.accounttitle,a.accountid";
 
 
     if ($stmt = mysqli_prepare($link, $sql)) {
@@ -71,7 +71,7 @@ function DisplayLedger()
             // Store result
             mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result( $stmt ,$abc, $accounttitle, $balance);
+            mysqli_stmt_bind_result( $stmt ,$abc, $accounttitle, $balance , $accountid);
 
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
@@ -81,7 +81,7 @@ function DisplayLedger()
 
 <tr>
     <td> <?php echo $abc; ?> </td>
-    <td> <?php echo $accounttitle ?> </td>
+    <td> <a href="partyledger.php?fromdate=<?php echo htmlentities(strtotime($_POST["kt_datepicker_1"])); ?>&todate=<?php echo htmlentities(strtotime($_POST["kt_datepicker_2"])); ?>&accountid=<?php echo $accountid;?>"><?php echo $accounttitle ?> </a></td>
     <td> <?php echo number_format($balance) ?> </td>
 </tr>
 
@@ -287,6 +287,7 @@ function DisplayControlAccounts()
                                                                     <?php DisplayControlAccounts() ?>
                                                                 </select>
                                                             </div>
+                                                           
                                                             <div class="col-lg-3 mt-12">
                                                                 <button type="submit"
                                                                     class="btn btn-success mr-2">Submit</button>

@@ -4,11 +4,9 @@
 // Initialize the session
 session_start();
 
-$_TotalTons = 0;
-$_TotalValue = 0;
 $_TotalExpenses = 0;
-$_TotalAssignedQuantity = 0;
-$_TotalAssignedValue=0;
+$_TotalIncomeCompanies = 0;
+$_TotalIncomeOthers = 0;
 
 if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
     header("location: index.php");
@@ -28,7 +26,7 @@ if (isset($_POST["kt_datepicker_2"])) {
 
 $querytext = "";
 
-function DisplayAttendences()
+function DisplayIncome()
 {
     require "config.php";
 
@@ -36,19 +34,27 @@ function DisplayAttendences()
     mysqli_set_charset($link, "utf8");
     $sql = "";
 
-    if (isset($_POST["filterby1"]) ) {
-        $sql = "SELECT kg.entrydatetime 'EntryDate' , ckl.vehiclenumber , c.partyname , ckl.weightintons - kg.weightintons 'TotalTons'  , 
-        ckl.totalprice	FROM kanta_general kg JOIN company_kanta_log ckl ON kg.id = ckl.kanta_general_id
-           JOIN companies c ON c.id = kg.companyid
-           JOIN mine m ON m.id = ckl.mineid
-       WHERE cast(kg.entrydatetime as date) >= ? and cast(kg.entrydatetime as date) < date_add(?,interval 1 day) and ckl.MineId = ?";
-    } 
+        $sql = "
+        select taggedaccount,sum(amount) 'amount' from (
+            select case when incexptag = 1 then 'income' else 'expense' end 'type',
+                abs(tr.amount) 'amount',
+                case when projectidtype = 0 then 'not tagged' when projectidtype = 1 then (select projectname from projects where projects.id = tr.projectid)
+                when projectidtype = 2 then (select employeename from employees where employees.id = tr.projectid)
+                when projectidtype = 3 then (select accounttitle from accounts where accounts.accountid = tr.projectid) end 'taggedaccount',
+                case when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 1) then 'company'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 2) then 'customer'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 3) then 'fixed tekadar'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 4) then 'mate'
+                    when projectidtype = 3 and not exists (select * from companies where companies.accountid = tr.projectid) then 'general account' else 'general account'
+                end 'accounttype' 
+                    from transactions tr join accounts a on a.accountid = tr.accountid
+                left join mine m on m.id = tr.mineid                
+                where tr.transactiondate >= ? and tr.transactiondate < timestampadd(day,1,?) and  tr.incexptag in (1)) as s where s.accounttype = 'company' group by taggedaccount";
+    
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         // Bind variables to the prepared statement as parameters
-        if (isset($_POST["filterby1"])) {
-            mysqli_stmt_bind_param($stmt, "sss", $FromDate, $ToDate,$MineId);
-        }
+            mysqli_stmt_bind_param($stmt, "ss", $FromDate, $ToDate);
 
         if (!isset($_POST["kt_datepicker_1"])) {
             $FromDate = Date('Y-m-d');
@@ -58,19 +64,12 @@ function DisplayAttendences()
             $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
         }
 
-        
-        if (!isset($_POST["filterby1"])) {
-            $MineId = 0;
-        } else {
-            $MineId = $_POST["filterby1"];
-        }
-
         // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
             // Store result
             mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result($stmt,  $EntryDate, $VehicleNumber, $PartyName, $TotalTons, $TotalPrice);
+            mysqli_stmt_bind_result($stmt,  $AccountTitle , $TotalIncomeAmount);
 
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
@@ -80,17 +79,12 @@ function DisplayAttendences()
 
 
 <tr>
-    <td> <?php echo date_format(new DateTime($EntryDate), 'd-m-Y'); ?> </td>
-    <td> <?php echo $VehicleNumber; ?> </td>
-    <td class="noori-normal-12"> <?php echo $PartyName; ?> </td>
-    <td><?php echo number_format($TotalPrice/$TotalTons,2); ?></td>
-    <td> <?php echo number_format($TotalTons,2) ?> </td>
-    <td> <?php echo number_format($TotalPrice) ?> </td>
+    <td> <?php echo $AccountTitle; ?> </td>
+    <td> <?php echo number_format($TotalIncomeAmount,2) ?> </td>
 </tr>
 
 <?php 
-                    $GLOBALS['_TotalTons'] += $TotalTons;
-                    $GLOBALS['_TotalValue'] += $TotalPrice;
+                    $GLOBALS['_TotalIncomeCompanies'] += $TotalIncomeAmount;
                 endwhile;
             }
         } else {
@@ -106,7 +100,7 @@ function DisplayAttendences()
 }
 
 
-function DisplayStock()
+function DisplayIncomeOthers()
 {
     require "config.php";
 
@@ -114,18 +108,27 @@ function DisplayStock()
     mysqli_set_charset($link, "utf8");
     $sql = "";
 
-    if (isset($_POST["filterby1"]) ) {
-        $sql = "select sa.assigneddateTime,m.minedescription , i.itemname , sa.quantity , sa.totalprice FROM items i join
-        stockassignments sa ON i.id = sa.itemId
-    JOIN mine m ON m.id = sa.mineid
-WHERE cast(sa.assigneddatetime as date) >= ? and cast(sa.assigneddatetime as date)  < date_add(?,interval 1 day) AND sa.mineid = ?";
-    } 
+        $sql = "
+        select taggedaccount,sum(amount) 'amount' from (
+            select case when incexptag = 1 then 'income' else 'expense' end 'type',
+                abs(tr.amount) 'amount',
+                case when projectidtype = 0 then 'not tagged' when projectidtype = 1 then (select projectname from projects where projects.id = tr.projectid)
+                when projectidtype = 2 then (select employeename from employees where employees.id = tr.projectid)
+                when projectidtype = 3 then (select accounttitle from accounts where accounts.accountid = tr.projectid) end 'taggedaccount',
+                case when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 1) then 'company'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 2) then 'customer'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 3) then 'fixed tekadar'
+                    when projectidtype = 3 and exists (select * from companies where companies.accountid = tr.projectid and companies.customertypeid = 4) then 'mate'
+                    when projectidtype = 3 and not exists (select * from companies where companies.accountid = tr.projectid) then 'general account' else 'general account'
+                end 'accounttype' 
+                    from transactions tr join accounts a on a.accountid = tr.accountid
+                left join mine m on m.id = tr.mineid                
+                where tr.transactiondate >= ? and tr.transactiondate < timestampadd(day,1,?) and  tr.incexptag in (1)) as s where s.accounttype <> 'company' group by taggedaccount";
+    
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         // Bind variables to the prepared statement as parameters
-        if (isset($_POST["filterby1"])) {
-            mysqli_stmt_bind_param($stmt, "sss", $FromDate, $ToDate,$MineId);
-        }
+            mysqli_stmt_bind_param($stmt, "ss", $FromDate, $ToDate);
 
         if (!isset($_POST["kt_datepicker_1"])) {
             $FromDate = Date('Y-m-d');
@@ -135,19 +138,12 @@ WHERE cast(sa.assigneddatetime as date) >= ? and cast(sa.assigneddatetime as dat
             $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
         }
 
-        
-        if (!isset($_POST["filterby1"])) {
-            $MineId = 0;
-        } else {
-            $MineId = $_POST["filterby1"];
-        }
-
         // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
             // Store result
             mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result($stmt,  $EntryDate, $MineDescription, $ItemName, $Quantity, $TotalPrice);
+            mysqli_stmt_bind_result($stmt,  $AccountTitle , $TotalIncomeAmount);
 
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
@@ -157,15 +153,12 @@ WHERE cast(sa.assigneddatetime as date) >= ? and cast(sa.assigneddatetime as dat
 
 
 <tr>
-    <td> <?php echo date_format(new DateTime($EntryDate), 'd-m-Y'); ?> </td>
-    <td> <?php echo $ItemName; ?> </td>
-    <td> <?php echo number_format($Quantity) ?> </td>
-    <td> <?php echo number_format($TotalPrice) ?> </td>
+    <td> <?php echo $AccountTitle; ?> </td>
+    <td> <?php echo number_format($TotalIncomeAmount,2) ?> </td>
 </tr>
 
 <?php 
-                    $GLOBALS['_TotalAssignedQuantity'] += $Quantity;
-                    $GLOBALS['_TotalAssignedValue'] += $TotalPrice;
+                    $GLOBALS['_TotalIncomeOthers'] += $TotalIncomeAmount;
                 endwhile;
             }
         } else {
@@ -179,6 +172,8 @@ WHERE cast(sa.assigneddatetime as date) >= ? and cast(sa.assigneddatetime as dat
     // Close connection
     mysqli_close($link);
 }
+
+
 
 function DisplayExpenses()
 {
@@ -188,19 +183,17 @@ function DisplayExpenses()
     mysqli_set_charset($link, "utf8");
     $sql = "";
 
-    if (isset($_POST["filterby1"]) ) {
-        $sql = "SELECT a.accounttitle , t.transactiondate , t.particulars , t.amount , m.minedescription  , t.SerialNo
-        FROM accounts a JOIN transactions t ON a.accountid = t.AccountId
-            JOIN mine m ON m.id = t.mineid
-        WHERE cast(t.transactiondate as date) >= ? AND cast(t.transactiondate as date) < date_add(?,interval 1 day) 
-            and t.mineid = ? AND t.amount > 0";
-    } 
+        $sql = "select a.accounttitle , sum(tr.amount) 'totalexpense'
+        from transactions tr join accounts a on a.accountid = tr.accountid
+    left join mine m on m.id = tr.mineid
+WHERE TR.TransactionDate >= ? AND Tr.TransactionDate < DATE_ADD(?,INTERVAL 1 DAY) AND  tr.IncExpTag in (2)
+group by a.accounttitle";
+    
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         // Bind variables to the prepared statement as parameters
-        if (isset($_POST["filterby1"])) {
-            mysqli_stmt_bind_param($stmt, "sss", $FromDate, $ToDate,$MineId);
-        }
+            mysqli_stmt_bind_param($stmt, "ss", $FromDate, $ToDate);
+        
 
         if (!isset($_POST["kt_datepicker_1"])) {
             $FromDate = Date('Y-m-d');
@@ -210,46 +203,25 @@ function DisplayExpenses()
             $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
         }
 
-        
-        if (!isset($_POST["filterby1"])) {
-            $MineId = 0;
-        } else {
-            $MineId = $_POST["filterby1"];
-        }
-
         // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
             // Store result
             mysqli_stmt_store_result($stmt);
 
-            mysqli_stmt_bind_result($stmt, $AccountTitle , $EntryDate, $Particulars, $Amount, $MineDescription, $Serial);
+            mysqli_stmt_bind_result($stmt, $AccountTitle , $TotalExpenseAmount);
 
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
 
 
                 while (mysqli_stmt_fetch($stmt)) : ?>
-<tr class="bg-light-primary" style="height:20px;">
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-    <td class="noori-normal-12" colspan="5"> <?php echo $Particulars; ?> </td>
-</tr>
 <tr>
     <td> <?php echo $AccountTitle; ?> </td>
-    <td> <?php echo date_format(new DateTime($EntryDate), 'd-m-Y'); ?> </td>
-    <td> <?php echo number_format($Amount,2) ?> </td>
-    <td class="noori-normal-12"> <?php echo $MineDescription; ?> </td>
-    <td> <?php echo number_format($Serial) ?> </td>
+    <td> <?php echo number_format($TotalExpenseAmount,2); ?> </td>
 </tr>
 
 <?php 
-                    $GLOBALS['_TotalExpenses'] += $Amount;
+                    $GLOBALS['_TotalExpenses'] += $TotalExpenseAmount;
                 endwhile;
             }
         } else {
@@ -262,87 +234,6 @@ function DisplayExpenses()
 
     // Close connection
     mysqli_close($link);
-}
-
-
-function DisplayMines()
-{
-
-    require "config.php";
-
-    mysqli_set_charset($link, "utf8");
-    $sql = "";
-
-    $sql = "SELECT id,minedescription FROM mine where MineStatusid = 3";
-
-    if ($stmt = mysqli_prepare($link, $sql)) {
-
-        // Attempt to execute the prepared statement
-        if (mysqli_stmt_execute($stmt)) {
-            // Store result
-            mysqli_stmt_store_result($stmt);
-
-            mysqli_stmt_bind_result($stmt,  $AccountId, $AccountTitle);
-
-            if (mysqli_stmt_num_rows($stmt) > 0) {
-
-                while (mysqli_stmt_fetch($stmt)) {
-                    if (isset($_POST['filterby1']) && $_POST['filterby1'] == $AccountId) {
-                        echo "<option value= " . $AccountId . " selected>" . $AccountTitle . "</option>";
-                    } else {
-                        echo "<option value= " . $AccountId . ">" . $AccountTitle . "</option>";
-                    }
-                }
-            } else {
-                echo "Oops! Something went wrong. Please try again later.";
-            }
-
-            // Close statement
-            mysqli_stmt_close($stmt);
-        }
-
-        // Close connection
-        mysqli_close($link);
-    }
-}
-
-function displayclasses1()
-{
-        
-    if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "1"))
-    {
-        echo "row mb-4";
-    }
-    else
-    {
-        echo "row mb-4 hidden";
-    }
-}
-
-function displayclasses2()
-{
-        
-    if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "2"))
-    {
-        echo "row mb-4";
-    }
-    else
-    {
-        echo "row mb-4 hidden";
-    }
-}
-
-function displayclasses3()
-{
-        
-    if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "3"))
-    {
-        echo "row mb-4";
-    }
-    else
-    {
-        echo "row mb-4 hidden";
-    }
 }
 
 ?>
@@ -355,7 +246,7 @@ function displayclasses3()
 <head>
     <base href="">
     <meta charset="utf-8" />
-    <title> Entries </title>
+    <title> آمدن اور اخراجات  </title>
     <meta name="description" content="Description here" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
@@ -409,7 +300,7 @@ function displayclasses3()
                                             <div class="card card-primary">
 
                                                 <div class="card-body">
-                                                    <form method="post" action="minedetailed.php">
+                                                    <form method="post" action="incomeexpensereport.php">
                                                         <div class="form-group row">
                                                             <div class="col-lg-3 mt-4">
                                                                 <label> تاریخ سے لے کر :</label>
@@ -435,24 +326,7 @@ function displayclasses3()
 
                                                             </div>
                                                            
-                                                            <div class="col-lg-5 mt-4">
-                                                                <label> مائن </label>
-                                                                <select class="form-control select2" id="filterby1"
-                                                                    name="filterby1">
-                                                                   
-                                                                    <?php DisplayMines() ?>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-lg-5 mt-4">
-                                                                <label> ڈیٹا کی قسم </label>
-                                                                <select class="form-control" id="filterdata"
-                                                                    name="filterdata">
-                                                                    <option value="0" selected>سب دکھائیں</option> 
-                                                                    <option value="1" >گاڑیوں کی ترسیل</option> 
-                                                                    <option value="2" >اخراجات</option> 
-                                                                    <option value="3" > مائن اشیاء </option> 
-                                                                </select>
-                                                            </div>
+                                                                                                                    
                                                             <div class="col-lg-3 mt-12">
                                                                 <button type="submit"
                                                                     class="btn btn-success mr-2"> رپورٹ </button>
@@ -479,19 +353,19 @@ function displayclasses3()
                                             <tbody>
                                                 <tr>
                                                     <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> کل آمدن</td>
-                                                    <td> <h3 id="income1" name="income1"></h2> </td>
+                                                    <td> <h3 id="incometotal1" name="income1"></h2> </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> خرچہ </td>
+                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> کل خرچہ </td>
                                                     <td> <h3 id="expense1" name="expense1"></h2> </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> سٹاک خرچہ </td>
-                                                    <td> <h3 id="stock1" name="stock1"></h2> </td>
+                                                    <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> کمپنیز آمدن' </td>
+                                                    <td> <h3 id="incomecompanies1" name="stock1"></h2> </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> ٹوٹل خرچہ </td>
-                                                    <td> <h3 id="expensetotal1" name="expesetotal1"></h2> </td>
+                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> دیگر آمدن </td>
+                                                    <td> <h3 id="incomeothers1" name="expesetotal1"></h2> </td>
                                                 </tr>
                                             </tbody>
                                             </table>
@@ -500,11 +374,11 @@ function displayclasses3()
                                 </div>                                   
 
                                     
-                                    <div class="<?php displayclasses1(); ?>">
+                                    <div class="row mb-4">
                                         <div class="col-lg-12">
                                             <div class="card card-primary">
                                             <div class="card-header">
-                                            <h1>گاڑیوں کی ترسیل </h1>
+                                            <h1> اخراجات  </h1>
                                             </div>
                                                 <div class="card-body">
 
@@ -512,38 +386,21 @@ function displayclasses3()
                                                         <thead>
                                                             <tr>
 
-                                                                <th>تاریخ</th>
-                                                                <th>گاڑی نمبر</th>
-                                                                <th>پارٹی ںام</th>
-                                                                <th>فی ٹن</th>
-                                                                <th>ٹوٹل ٹن</th>
-                                                                <th>ٹوٹل قیمت</th>
+                                                                <th> کھاتہ</th>
+                                                                <th> کل رقم </th>
+
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <?php
-
-if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "1"))
-{
-    DisplayAttendences();
-}
-                                                            
-
-
-
+                                                                DisplayExpenses();
                                                             ?>
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><?php echo number_format($GLOBALS['_TotalTons']); ?>
-                                                                </td>
-                                                                <td><input type="hidden" id="income" name="income" value="<?php echo number_format($GLOBALS['_TotalValue']); ?>"><?php echo number_format($GLOBALS['_TotalValue']); ?>
-                                                                </td>                                                             
-                                                                
+                                                                <td> ٹوٹل اخراجات</td>
+                                                                <td><?php echo number_format($GLOBALS['_TotalExpenses']); ?> </td> 
+                                                                <input type="hidden" id="expense" value="<?php echo number_format($GLOBALS['_TotalExpenses']); ?>">                                        
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -551,42 +408,35 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="<?php displayclasses2(); ?>">
+                                    <div class="row mb-4">
                                         <div class="col-lg-12">
                                             <div class="card card-primary">
                                             <div class="card-header">
-                                            <h1> اخراجات </h1>
+                                            <h1> آمدن کمپنیز </h1>
                                             </div>
                                                 <div class="card-body">
 
                                                     <table id="tbl1" class="table">
                                                         <thead>
                                                             <tr>
-                                                            <th>کھاتہ</th>
-                                                                <th>تاریخ</th>                                                              
+                                                            <th>کھاتہ</th>                                                            
                                                                 <th>رقم</th>
-                                                                <th>مائن</th>
-                                                                <th>سیریل</th>                                                               
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <?php
 
-if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "2"))
-{
-                                                            DisplayExpenses();
-}
+                                                            DisplayIncome();
+
 
 
                                                             ?>
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><input type="hidden" id="expense" name="expense" value="<?php echo number_format($GLOBALS['_TotalExpenses']); ?>"><?php echo number_format($GLOBALS['_TotalExpenses']); ?></td>                                                               
-                                                                <td></td>
-                                                                <td></td>   
+                                                                <td> ٹوٹل آمدن</td>
+                                                                <td><?php echo number_format($GLOBALS['_TotalIncomeCompanies']); ?></td> 
+                                                                <input type="hidden" id="incomecompanies" value="<?php echo number_format($GLOBALS['_TotalIncomeCompanies']); ?>">                                        
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -594,41 +444,36 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="<?php displayclasses3(); ?>">
+                                    <div class="row mb-4">
                                         <div class="col-lg-12">
                                             <div class="card card-primary">
                                             <div class="card-header">
-                                            <h1> مائن اشیاء </h1>
+                                            <h1> آمدن دیگر </h1>
                                             </div>
                                                 <div class="card-body">
 
-                                                    <table id="tbl2" class="table">
+                                                    <table id="tbl1" class="table">
                                                         <thead>
                                                             <tr>
-                                                            
-                                                                <th>تاریخ</th>                                                              
-                                                                <th>نام اشیاء</th>
-                                                                <th>مقدار</th>
-                                                                <th>کل قیمت</th>                                                               
+                                                            <th>کھاتہ</th>                                                            
+                                                                <th>رقم</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             <?php
 
-if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filterdata"] == "3"))
-{
-                                                                DisplayStock();
-}
+                                                            DisplayIncomeOthers();
+
 
 
                                                             ?>
                                                         </tbody>
                                                         <tfoot>
                                                             <tr>
-                                                                <td><input type="hidden" id="expensestotal" name="expensestotal" value="<?php echo number_format($GLOBALS['_TotalAssignedValue'] + $GLOBALS['_TotalExpenses']); ?>"></td>
-                                                                <td></td>
-                                                                <td><?php echo number_format($GLOBALS['_TotalAssignedQuantity']); ?></td>                                                               
-                                                                <td><input type="hidden" id="stock" name="stock" value="<?php echo number_format($GLOBALS['_TotalAssignedValue']); ?>"><?php echo number_format($GLOBALS['_TotalAssignedValue']); ?></td>
+                                                                <td> ٹوٹل آمدن </td>
+                                                                <td><?php echo number_format($GLOBALS['_TotalIncomeOthers']); ?></td> 
+                                                                <input type="hidden" id="incomeothers" value="<?php echo number_format($GLOBALS['_TotalIncomeOthers']); ?>">                                        
+                                                                <input type="hidden" id="incometotal" value="<?php echo number_format($GLOBALS['_TotalIncomeOthers'] + $GLOBALS['_TotalIncomeCompanies']); ?>">                                        
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -636,6 +481,8 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
                                             </div>
                                         </div>
                                     </div>
+                                    
+
                                 </div>
                             </div>
 
@@ -666,11 +513,12 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
     $(document).ready(function() {
 
         setTimeout(() => {
-            $('#income1').html($('#income').val());        
+            $('#incomecompanies1').html($('#incomecompanies').val());        
             $('#expense1').html($('#expense').val());
-            $('#stock1').html($('#stock').val());
+            $('#incomeothers1').html($('#incomeothers').val());
 
-            $('#expensetotal1').html($('#expensestotal').val());
+            $('#incometotal1').html($('#incometotal').val());
+
         }, 1000);
 
         $('#filterby').select2({
