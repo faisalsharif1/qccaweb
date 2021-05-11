@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate credentials
     if (empty($username_err) && empty($password_err)) {
         // Prepare a select statement
-        $sql = "SELECT id, username, password , isadmin FROM users WHERE username = ? and Password = ?";
+        $sql = "SELECT id, username, password , isadmin FROM users WHERE username = ? and Password = ? and IsAllowedOnWeb = 1";
 
         if ($stmt = mysqli_prepare($link, $sql)) {
             // Bind variables to the prepared statement as parameters
@@ -64,7 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Redirect user to welcome page
                     header("location: dashboard.php");
                 } else {
-                    $password_err = "Invalid Credentials ! Please reenter user name and password";
+                    $password_err = "اپنا یوزر یا پاسورڈ چیک کریں یا آپ کو ویب سائیٹ تک رسائِ کی اجازت نہیں شکریہ ۔";
+                    header('Location: '.$_SERVER['PHP_SELF'].'?someerror='.htmlentities($password_err)); 
                 }
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
@@ -153,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input class="form-control h-auto form-control-solid py-4 px-8" type="password"
                                     placeholder="Password" name="password" />
                             </div>
-
+<input type="hidden" id="errormessage" name="errormessage" value="<?php if (isset($_GET["someerror"])) echo $_GET["someerror"]; ?>">
                             <button id="kt_login_signin_submit"
                                 class="btn btn-primary font-weight-bold px-9 py-4 my-3 mx-4">Sign In</button>
                         </form>
@@ -177,6 +178,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!--begin::Page Scripts(used by this page)-->
     <script src="assets/js/pages/custom/login/login-general.js?v=7.1.2"></script>
     <!--end::Page Scripts-->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            console.log($('#errormessage').val());
+            if ($('#errormessage').val().length > 0)
+            {            
+            swal({
+                    title: "Login Error",
+                    text: $('#errormessage').val()
+                });
+            }
+            
+        });
+    </script>
 </body>
 <!--end::Body-->
 
