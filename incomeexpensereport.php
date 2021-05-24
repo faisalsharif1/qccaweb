@@ -351,10 +351,7 @@ group by a.accounttitle";
                                                       <th style="width:50%"></th>
                                                   </tr>                                                                                                                                                                  
                                             <tbody>
-                                                <tr>
-                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> منافع </td>
-                                                    <td> <h3 id="profit1" name="profit1"></h2> </td>
-                                                </tr>
+
                                                 <tr>
                                                     <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> کل آمدن</td>
                                                     <td> <h3 id="incometotal1" name="income1"></h2> </td>
@@ -362,6 +359,10 @@ group by a.accounttitle";
                                                 <tr>
                                                     <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> کل خرچہ </td>
                                                     <td> <h3 id="expense1" name="expense1"></h2> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> صافی آمدن </td>
+                                                    <td> <h3 id="profit1" name="profit1"></h2> </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> کمپنیز آمدن' </td>

@@ -493,6 +493,10 @@ function displayclasses3()
                                                     <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> ٹوٹل خرچہ </td>
                                                     <td> <h3 id="expensetotal1" name="expesetotal1"></h2> </td>
                                                 </tr>
+                                                <tr>
+                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> منافع </td>
+                                                    <td> <h3 id="profit1" name="profit1"></h2> </td>
+                                                </tr>
                                             </tbody>
                                             </table>
                                         </div>
@@ -626,9 +630,10 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
                                                         <tfoot>
                                                             <tr>
                                                                 <td><input type="hidden" id="expensestotal" name="expensestotal" value="<?php echo number_format($GLOBALS['_TotalAssignedValue'] + $GLOBALS['_TotalExpenses']); ?>"></td>
-                                                                <td></td>
+                                                                <td><input type="hidden" id="profit" name="profit" value="<?php echo number_format($GLOBALS['_TotalValue']-($GLOBALS['_TotalAssignedValue'] + $GLOBALS['_TotalExpenses'])); ?>"></td>
                                                                 <td><?php echo number_format($GLOBALS['_TotalAssignedQuantity']); ?></td>                                                               
-                                                                <td><input type="hidden" id="stock" name="stock" value="<?php echo number_format($GLOBALS['_TotalAssignedValue']); ?>"><?php echo number_format($GLOBALS['_TotalAssignedValue']); ?></td>
+                                                                <td><input type="hidden" id="stock" name="stock" value="<?php echo number_format($GLOBALS['_TotalAssignedValue']); ?>">
+                                                                                    <?php echo number_format($GLOBALS['_TotalAssignedValue']); ?></td>
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -669,6 +674,7 @@ if (isset($_POST["filterdata"]) && ($_POST["filterdata"] == "0" || $_POST["filte
             $('#income1').html($('#income').val());        
             $('#expense1').html($('#expense').val());
             $('#stock1').html($('#stock').val());
+            $('#profit1').html($('#profit').val());
 
             $('#expensetotal1').html($('#expensestotal').val());
         }, 1000);
