@@ -186,7 +186,7 @@ function DisplayExpenses()
         $sql = "select a.accounttitle , sum(tr.amount) 'totalexpense'
         from transactions tr join accounts a on a.accountid = tr.accountid
     left join mine m on m.id = tr.mineid
-WHERE TR.TransactionDate >= ? AND Tr.TransactionDate < DATE_ADD(?,INTERVAL 1 DAY) AND  tr.IncExpTag in (2)
+where tr.transactiondate >= ? and tr.transactiondate < date_add(?,INTERVAL 1 DAY) and  tr.incexptag in (2)
 group by a.accounttitle";
     
 
@@ -352,6 +352,10 @@ group by a.accounttitle";
                                                   </tr>                                                                                                                                                                  
                                             <tbody>
                                                 <tr>
+                                                    <td class="pl-20 font-size-h6 font-weight-bold" style="height:50px;"> منافع </td>
+                                                    <td> <h3 id="profit1" name="profit1"></h2> </td>
+                                                </tr>
+                                                <tr>
                                                     <td class="pl-20 font-size-h6 bg-light-primary font-weight-bold" style="height:50px;"> کل آمدن</td>
                                                     <td> <h3 id="incometotal1" name="income1"></h2> </td>
                                                 </tr>
@@ -474,6 +478,7 @@ group by a.accounttitle";
                                                                 <td><?php echo number_format($GLOBALS['_TotalIncomeOthers']); ?></td> 
                                                                 <input type="hidden" id="incomeothers" value="<?php echo number_format($GLOBALS['_TotalIncomeOthers']); ?>">                                        
                                                                 <input type="hidden" id="incometotal" value="<?php echo number_format($GLOBALS['_TotalIncomeOthers'] + $GLOBALS['_TotalIncomeCompanies']); ?>">                                        
+                                                                <input type="hidden" id="profit" value="<?php echo number_format(($GLOBALS['_TotalIncomeOthers'] + $GLOBALS['_TotalIncomeCompanies'])-$GLOBALS['_TotalExpenses']); ?>">
                                                             </tr>
                                                         </tfoot>
                                                     </table>
@@ -516,8 +521,8 @@ group by a.accounttitle";
             $('#incomecompanies1').html($('#incomecompanies').val());        
             $('#expense1').html($('#expense').val());
             $('#incomeothers1').html($('#incomeothers').val());
-
             $('#incometotal1').html($('#incometotal').val());
+            $('#profit1').html($('#profit').val());
 
         }, 1000);
 
