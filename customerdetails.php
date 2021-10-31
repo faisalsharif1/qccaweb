@@ -24,13 +24,23 @@ function DisplayCompanyDetails()
     if (isset($_POST["kt_datepicker_1"])) {
         $FromDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_1"]));
     } else {
-        $FromDate = Date('Y-m-d');
+        if (isset($_GET["Date"])){
+            $FromDate = Date('Y-m-d',strtotime($_GET["Date"]));
+        }
+        else {
+            $FromDate = Date('Y-m-d');
+        }
     }
 
     if (isset($_POST["kt_datepicker_2"])) {
         $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
     } else {
-        $ToDate = Date('Y-m-d');
+        if (isset($_GET["Date"])){
+            $ToDate = Date('Y-m-d',strtotime($_GET["Date"]));
+        }
+        else {
+            $ToDate = Date('Y-m-d');
+        }
     }
 
     if (isset($_POST["CompanyId"])) {
@@ -45,10 +55,10 @@ function DisplayCompanyDetails()
 
     require "config.php";
     // Prepare a select statement
-    $sql = "SELEcT  DATE_FORMAT(kg.EntryDateTime,'%d-%m-%Y') 'EnryDateTime' , ckl.SerialId , kg.VehicleNumber ,  ckl.WeightInTons - kg.WeightInTons 'TotalWeight' , ckl.TotalPrice
-	FROM companies c JOIN Kanta_General kg ON c.id = kg.companyId
+    $sql = "select  DATE_FORMAT(kg.EntryDateTime,'%d-%m-%Y') 'EnryDateTime' , ckl.SerialId , kg.VehicleNumber ,  ckl.WeightInTons - kg.WeightInTons 'TotalWeight' , ckl.TotalPrice
+	from companies c JOIN kanta_general kg ON c.id = kg.companyId
 		JOIN company_kanta_log ckl ON kg.id = ckl.Kanta_General_id		
-            WHERE kg.EntryDateTime >= ? and kg.entrydatetime < datae_add(?,INTERVAL 1 DAY) AND kg.companyId = ?";
+            WHERE kg.EntryDateTime >= ? and kg.entrydatetime < date_add(?,INTERVAL 1 DAY) AND kg.companyId = ?";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         // Bind variables to the prepared statement as parameters
@@ -154,7 +164,7 @@ function DisplayCompanyDetails()
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <form method="post" action="companiesdetail.php">
+                                                    <form method="post" action="customerdetails.php">
                                                         <div class="form-group row">
                                                             <div class="col-lg-4 mt-4">
                                                                 <label> From Date :</label>

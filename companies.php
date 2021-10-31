@@ -45,7 +45,7 @@ function DisplayCompaniesInDashBoard()
                 while (mysqli_stmt_fetch($stmt)) : ?>
 <div class="col-xl-4">
     <!--begin::Stats Widget 29-->
-    <a href="companiesdetail.php?CompanyId=<?php echo $CompanyId; ?>">
+    <a href="companiesdetail.php?CompanyId=<?php echo $CompanyId; ?>&Date=<?php echo date("Y-m-d") ;?>">
         <div class="card card-custom bgi-no-repeat card-stretch gutter-b"
             style="background-position: right top; background-size: 30% auto; background-image: url(assets/media/svg/shapes/abstract-1.svg)">
             <!--begin::Body-->

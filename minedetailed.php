@@ -273,7 +273,7 @@ function DisplayMines()
     mysqli_set_charset($link, "utf8");
     $sql = "";
 
-    $sql = "SELECT id,minedescription FROM mine where MineStatusid = 3";
+    $sql = "SELECT id,minedescription FROM mine where minesownedby = 2";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
 

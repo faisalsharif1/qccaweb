@@ -4,7 +4,8 @@
 // Initialize the session
 session_start();
 
-
+$_TotalDebit = 0;
+$_TotalCredit = 0;
 
 if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
     header("location: index.php");
@@ -148,6 +149,7 @@ function DisplayInvoiceDetails($link, $fnInvNumber)
 
                 while (mysqli_stmt_fetch($stmt)) : ?>
 
+                    <?php $GLOBALS["_TotalDebit"] += $Amount > 0 ? $Amount : 0; $GLOBALS["_TotalCredit"]+=$Amount < 0 ? $Amount : 0; ?>
 
 <div class="d-flex align-items-center mb-9 bg-light-warning rounded p-5">
     <!--begin::Icon-->

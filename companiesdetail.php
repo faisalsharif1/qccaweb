@@ -26,13 +26,23 @@ function DisplayCompanyDetails()
     if (isset($_POST["kt_datepicker_1"])) {
         $FromDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_1"]));
     } else {
-        $FromDate = Date('Y-m-d');
+        if (isset($_GET["Date"])){
+            $FromDate = Date('Y-m-d',strtotime($_GET["Date"]));
+        }
+        else {
+            $FromDate = Date('Y-m-d');
+        }
     }
 
     if (isset($_POST["kt_datepicker_2"])) {
         $ToDate = Date('Y-m-d', strtotime($_POST["kt_datepicker_2"]));
     } else {
-        $ToDate = Date('Y-m-d');
+        if (isset($_GET["Date"])){
+            $ToDate = Date('Y-m-d',strtotime($_GET["Date"]));
+        }
+        else {
+            $ToDate = Date('Y-m-d');
+        }
     }
 
     if (isset($_POST["CompanyId"])) {

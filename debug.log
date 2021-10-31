@@ -1,2 +1,0 @@
-[1023/214641.285:ERROR:filesystem_win.cc(129)] GetFileAttributes c:\Users\Faisal\AppData\Roaming\Code\User\workspaceStorage\867ba0c226c956df06bf8d4e5f06e1c5\ms-vscode.js-debug\.profile\Crashpad\attachments\4976f1ca-2744-4197-90f7-d1f25efa3ad6: The system cannot find the path specified. (0x3)
-[1024/033158.210:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)
