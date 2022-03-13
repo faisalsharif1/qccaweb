@@ -27,8 +27,8 @@ function DisplayCompaniesInDashBoard()
     // Prepare a select statement
     $sql = "SELECT DISTINCT t.invoiceNumber , t.SerialNo , DATE_FORMAT(t.TransactionDate , '%d-%m-%Y') AS
     TransactionDate
-     FROM accounts a JOIN transactions t ON a.AccountId = t.AccountId
-WHERE  cast(t.TransactionDate as date) >= ? AND cast(t.TransactionDate as date) < date_add(?,INTERVAL 1 DAY) and t.IsManualEntry = 1 and t.IsApproved = 1 ORDER BY InvoiceNumber";
+     FROM accounts a JOIN transactions t ON a.AccountId = t.AccountId left JOIN kanta_general kg on t.invoicenumber = kg.invoicenumber
+WHERE  cast(t.TransactionDate as date) >= ? AND cast(t.TransactionDate as date) < date_add(?,INTERVAL 1 DAY) and t.IsApproved = 1 and kg.id is null ORDER BY InvoiceNumber";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         // Bind variables to the prepared statement as parameters

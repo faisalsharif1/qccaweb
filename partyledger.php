@@ -13,6 +13,9 @@ if (!isset($_SESSION["loggedin"]) && !$_SESSION["loggedin"] === true) {
 $FromDate;
 $ToDate;
 
+$GLOBALS['TotalCredits'] = 0;
+$GLOBALS['TotalDebits'] = 0;
+
 
 
 $querytext = "";
@@ -69,18 +72,21 @@ function DisplayLedger()
             if (mysqli_stmt_num_rows($stmt) > 0) {
 
 
-                while (mysqli_stmt_fetch($stmt)) : ?>
-
+                while (mysqli_stmt_fetch($stmt)) :  $GLOBALS['TotalCredits'] += $Amount < 0 ? $Amount : 0;
+                $GLOBALS['TotalDebits'] += $Amount > 0 ? $Amount : 0;   ?>
 
 <tr>
     <td class="text-nowrap"> <?php echo date_format(new DateTime($TransactionDate), 'd-m-Y'); ?> </td>
     <td> <?php echo $SerialNo; ?> </td>
     <td style="text-align: right; direction: rtl;"> <?php echo $Particulars; ?> </td>
     <td> <?php echo number_format($Amount) ?> </td>
-    <td> <?php echo number_format($Balance) ?> </td>
+    <td> <?php echo number_format($Balance);?> </td>
 </tr>
 
+
 <?php
+            
+
                 endwhile;
             }
         } else {
@@ -291,6 +297,13 @@ function DisplayAccounts()
 
                                                                 ?>
                                                             </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="3">ٹوٹل </td>                                                                    
+                                                                    <td><?php echo number_format($GLOBALS['TotalCredits']); ?></td>
+                                                                    <td><?php echo number_format($GLOBALS['TotalDebits']); ?></td>
+                                                                </tr>
+                                                                                                                                                                                                        </tfoot>
                                                         </table>
                                                     </div>
                                                 </div>
